@@ -1,0 +1,197 @@
+<div class="container-fluid">
+    <p-toast position="center" key="c" (onClose)="Rechazar()" [baseZIndex]="5000">
+        <ng-template let-message pTemplate="message">
+            <div>
+                <div class="p-d-flex p-flex-column">
+                    <div class="text-center">
+                        <i class="pi pi-exclamation-triangle" style="font-size: 3rem"></i>
+                        <h4>{{message.summary}}</h4>
+                        <p>{{message.detail}}</p>
+                    </div>
+                </div>
+                <div class="p-d-flex">
+                    <div class="p-mr-2">
+                            <button type="button" pButton (click)="Aceptar()" label="Si" class="p-button-success px-5">
+                            </button>
+                            <button type="button" pButton (click)="Rechazar()" label="No" class="p-button-secondary ml-5 px-5">
+                            </button>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </p-toast>
+    <p-messages [value]="msgs"></p-messages>
+    <p-toast [style]="{marginTop: '80px'}" position="top-right" key="msj"></p-toast>
+    <div class="row justify-content-end mt-5 mx-1">
+        <div>
+            <button type="button" class="btn btn-success font-weight-bold" (click)="agregarNuevoEmpleado()">
+                Nuevo&nbsp;<i class="pi pi-plus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="row align-items-center justify-content-center">
+        <div class="col-md-12">
+            <div class="animated fadeIn">
+                <div class="card mt-1">
+                    <div class="card-header">
+                        <div class="text-center">
+                            <strong>Lista de Empleados</strong>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p-table [value]="empleados">
+                            <ng-template pTemplate="header">
+                                <tr class="font-weight-bold">
+                                    <th>Nombre Completo</th>
+                                    <th>Fecha Nacimiento</th>
+                                    <th>Departamento</th>
+                                    <th>Sueldo</th>
+                                    <th colspan="2" class="text-center">Accion</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-emp>
+                                <tr>
+                                    <td>{{ emp.Nombre+' '+emp.ApPaterno+' '+emp.ApMaterno }}</td>
+                                    <td>{{emp.FecNac | date: 'dd/MM/yyyy' }}</td>
+                                    <td>{{emp.num_Departamento.desc_descripcion}}</td>
+                                    <td>{{emp.Sueldo | currency:'USD':'symbol'}}</td>
+                                    <td colspan="2">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <button type="button" class="btn btn-md btn-warning"
+                                                    (click)="editarInformacionEmpleado(emp)">
+                                                    Editar&nbsp;<i class="pi pi-pencil"></i>
+                                                </button>
+                                            </div>
+                                            <div class="col-6">
+                                                <button type="button" class="btn btn-md btn-danger"
+                                                    (click)="eliminarInformacionEmpleado(emp)">
+                                                    Eliminar&nbsp;<i class="pi pi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #template>
+    <div class="modal-header">
+      <h4 class="modal-title pull-left">Captura</h4>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="animated fadeIn">
+        <div class="row justify-content-center">
+          <div class="col-md-12">
+            <div class="card">
+              <form ngNoForm action="" class="form-horizontal" [formGroup]="empleadoForm" (ngSubmit)="guardarEmpleado()">
+                <div class="card-header">
+                  <strong> {{ title }} </strong>
+                </div>
+                <div class="card-body">
+                  <div class="form-group row">
+                    <label class="col-md-5 form-control-label"
+                      for="Clave_Emp"><strong>Clave Empleado</strong></label>
+                    <div class="col-md-6">
+                      <input formControlName="Clave_Emp" class="form-control" id="Clave_Emp"
+                        name="Clave_Emp" placeholder="Ingrese Clave" type="text" disabled />
+                      <span *ngIf="empleadoForm.controls['Clave_Emp'].invalid && 
+                      empleadoForm.controls['Clave_Emp'].touched"
+                        class="help-block text-danger">Este campo es requerido</span>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-md-5 form-control-label"
+                      for="Nombre"><strong>Nombre Empleado</strong></label>
+                    <div class="col-md-6">
+                      <input formControlName="Nombre" class="form-control" id="Nombre"
+                        name="Nombre" placeholder="Ingrese Nombre" type="text" />
+                      <span *ngIf="empleadoForm.controls['Nombre'].invalid && 
+                      empleadoForm.controls['Nombre'].touched"
+                        class="help-block text-danger">Este campo es requerido</span>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-md-5 form-control-label"
+                      for="ApPaterno"><strong>Apellido Paterno</strong></label>
+                    <div class="col-md-6">
+                      <input formControlName="ApPaterno" class="form-control" id="ApPaterno"
+                        name="ApPaterno" placeholder="Ingrese Apellido Paterno" type="text" />
+                      <span *ngIf="empleadoForm.controls['ApPaterno'].invalid && 
+                      empleadoForm.controls['ApPaterno'].touched"
+                        class="help-block text-danger">Este campo es requerido</span>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-md-5 form-control-label"
+                      for="ApMaterno"><strong>Apellido Materno</strong></label>
+                    <div class="col-md-6">
+                      <input formControlName="ApMaterno" class="form-control" id="ApMaterno"
+                        name="ApMaterno" placeholder="Ingrese Apellido Materno" type="text" />
+                      <span *ngIf="empleadoForm.controls['ApMaterno'].invalid && 
+                      empleadoForm.controls['ApMaterno'].touched"
+                        class="help-block text-danger">Este campo es requerido</span>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-md-5 form-control-label"
+                      for="FecNac"><strong>Fecha</strong></label>
+                    <div class="col-md-6">
+                      <!--<input formControlName="FecNac" class="form-control" id="FecNac"
+                        name="FecNac" placeholder="Seleccione Fecha" type="text" />-->
+                        <p-calendar formControlName="FecNac" dateFormat="dd/mm/yy"
+                        [monthNavigator]="true" [yearNavigator]="true" yearRange="1950:2021" inputId="navigators"></p-calendar>  
+                      <span *ngIf="empleadoForm.controls['FecNac'].invalid && 
+                      empleadoForm.controls['FecNac'].touched"
+                        class="help-block text-danger">Este campo es requerido</span>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-md-5 form-control-label"
+                      for="num_Departamento"><strong>Departamento</strong></label>
+                    <div class="col-md-6">
+                        <p-dropdown [options]="departamentos" optionLabel="desc_descripcion" 
+                        formControlName="num_Departamento"></p-dropdown>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-md-5 form-control-label"
+                      for="Sueldo"><strong>Sueldo $</strong></label>
+                    <div class="col-md-6">
+                      <input formControlName="Sueldo" class="form-control" id="Sueldo"
+                        name="Sueldo" placeholder="Ingrese Sueldo" type="text" />
+                      <span *ngIf="empleadoForm.controls['Sueldo'].invalid && 
+                      empleadoForm.controls['Sueldo'].touched"
+                        class="help-block text-danger">Este campo es requerido</span>
+                    </div>
+                  </div>
+
+
+                </div>
+                <div class="card-footer clearfix">
+                  <div class="group-buttons float-right">
+                    <button *ngIf="!Clave_Emp" (click)="resetForm()" class="btn btn-sm btn-danger mx-2" type="reset">
+                      <i class="fa fa-ban"></i> Limpiar
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger mx-2" (click)="regresar()">Cancelar</button>
+                    <button [disabled]="!empleadoForm.valid" class="btn btn-sm btn-primary mx-2" type="submit">
+                      <i class="fa fa-dot-circle-o"></i> Guardar
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
